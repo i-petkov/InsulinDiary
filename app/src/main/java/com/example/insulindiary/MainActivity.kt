@@ -1,97 +1,64 @@
 package com.example.insulindiary
 
-import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.insulindiary.data.Measurement
-import com.example.insulindiary.data.formatTime
+import com.example.insulindiary.ui.screen.Routes
+import com.example.insulindiary.ui.screen.day.DailyViewScreen
+import com.example.insulindiary.ui.screen.day.DailyViewViewModel
+import com.example.insulindiary.ui.screen.month.MonthlyViewScreen
+import com.example.insulindiary.ui.screen.month.MonthlyViewViewModel
 import com.example.insulindiary.ui.theme.InsulinDiaryTheme
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 
 class MainActivity : ComponentActivity() {
 
-    val viewModel: DayViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        seedMeasurementForTesting()
+
         setContent {
             InsulinDiaryTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Greeting(viewModel)
+                val navController = rememberNavController()
+
+                NavHost(navController = navController, startDestination = Routes.MonthlyView.route) {
+                    composable(Routes.MonthlyView.route) {
+                        MonthlyViewScreen(onDayClicked = { day ->
+                            // TODO day payload?
+                            navController.navigate(Routes.DailyView.route)
+                        }, viewModel<MonthlyViewViewModel>())
+                    }
+                    composable(Routes.DailyView.route) {
+                        DailyViewScreen(onBackPressed = {
+                            navController.popBackStack()
+                        }, viewModel<DailyViewViewModel>())
+                    }
                 }
+            }
+        }
+    }
+
+    private fun seedMeasurementForTesting() {
+        val dao = (application as InsulinDiaryApplication).measurementDao
+        GlobalScope.launch {
+            val count = dao.getAllItems().count()
+            if (count == 0) {
+                val now = ZonedDateTime.now()
+                dao.insert(Measurement(now, 6.5))
+                dao.insert(Measurement(now.plusDays(1), 6.5))
+                dao.insert(Measurement(now.plusDays(2), 6.5))
             }
         }
     }
 }
 
-@Composable
-fun Greeting(viewModel: DayViewModel) {
-
-    Column {
-
-        Text(
-            text = "Hello MEASUREMENTS!",
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        val measurements = viewModel.measurements.collectAsStateWithLifecycle(initialValue = listOf())
-
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(measurements.value) {
-                Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = it.time.formatTime())
-                    Text(text = it.value.toString())
-                }
-            }
-        }
-
-        Button(onClick = { viewModel.insertDummyMeasurement() }) {
-            Text(text = "Add More")
-        }
-    }
-
-
-}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    InsulinDiaryTheme {
-//        Greeting("Android")
-//    }
-//}
-
-class DayViewModel(application: Application) : AndroidViewModel(application) {
-    private val measurementDao = (application as InsulinDiaryApplication).measurementDao
-
-    val measurements: StateFlow<List<Measurement>> = measurementDao.getAllItems()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
-    fun insertDummyMeasurement() {
-        viewModelScope.launch {
-            measurementDao.insert(Measurement(ZonedDateTime.now(), 1.1))
-        }
-    }
-}

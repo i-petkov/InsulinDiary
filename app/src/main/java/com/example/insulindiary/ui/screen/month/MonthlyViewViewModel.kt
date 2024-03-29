@@ -16,7 +16,12 @@ import kotlinx.coroutines.flow.stateIn
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
-class MonthViewModel(application: Application): AndroidViewModel(application), MonthViewModelInterface {
+interface MonthlyViewViewModelInterface {
+    val monthAndYear: StateFlow<ZonedDateTime>
+    val dailyAggregations: StateFlow<List<DailyAggregation>>
+}
+
+class MonthlyViewViewModel(application: Application): AndroidViewModel(application), MonthlyViewViewModelInterface {
     private val measurementDao = (application as InsulinDiaryApplication).measurementDao
     private val _monthAndYear = MutableStateFlow(ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS))
 

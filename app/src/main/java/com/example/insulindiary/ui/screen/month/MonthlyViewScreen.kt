@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.insulindiary.data.DailyAggregation
 import com.example.insulindiary.data.DailyMeasurementAggregation
 import com.example.insulindiary.data.Measurement
 import com.example.insulindiary.data.dayOfMonth
@@ -30,13 +29,8 @@ import kotlinx.coroutines.flow.StateFlow
 import java.time.ZonedDateTime
 import kotlin.random.Random
 
-interface MonthViewModelInterface {
-    val monthAndYear: StateFlow<ZonedDateTime>
-    val dailyAggregations: StateFlow<List<DailyAggregation>>
-}
-
 @Composable
-fun MonthScreen(onDayClicked: (ZonedDateTime)-> Unit, viewModel: MonthViewModelInterface) {
+fun MonthlyViewScreen(onDayClicked: (ZonedDateTime)-> Unit, viewModel: MonthlyViewViewModelInterface) {
     Column(
         horizontalAlignment = Alignment.End
     ) {
@@ -94,7 +88,7 @@ fun MonthScreenPreview() {
     }
 
     InsulinDiaryTheme {
-        MonthScreen({ /* no-op */ }, object : MonthViewModelInterface {
+        MonthlyViewScreen({ /* no-op */ }, object : MonthlyViewViewModelInterface {
             override val dailyAggregations: StateFlow<List<DailyMeasurementAggregation>>
                 get() = MutableStateFlow(dummy)
             override val monthAndYear: StateFlow<ZonedDateTime>
