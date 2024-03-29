@@ -3,14 +3,18 @@ plugins {
     id "com.android.application" version "8.2.0" apply false
     id "org.jetbrains.kotlin.android" version "1.9.0" apply false
     id "org.jlleitschuh.gradle.ktlint" version "12.1.0" apply false
+    id "com.google.devtools.ksp" version "1.9.10-1.0.13" apply false
+
 }
 
 subprojects {
     ext {
-        projectCompileSdk = 33
+        projectCompileSdk = 34
         projectMinSdk = 29
-        projectTargetSdk = 32
+        projectTargetSdk = 34
 
         ktxCoreVersion = "1.12.0"
+        roomVersion = "2.6.1"
+        androidxLifecycleVersion = "2.7.0"
     }
 }

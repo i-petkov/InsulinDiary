@@ -3,6 +3,7 @@ plugins {
     id "org.jetbrains.kotlin.android"
     id "ktlint-convention"
     id "common-build-tasks"
+    id "com.google.devtools.ksp"
 }
 
 int[] appVersionRaw = [1, 0, 0]
@@ -14,6 +15,10 @@ def _versionNameForDisplay = buildVersionNameShort(appVersionRaw)
 android {
     namespace "com.example.insulindiary"
     compileSdk project.projectCompileSdk
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId "com.example.insulindiary"
@@ -59,14 +64,23 @@ android {
 dependencies {
 
     implementation "androidx.core:core-ktx:$ktxCoreVersion"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
     implementation "androidx.activity:activity-compose:1.8.2"
 
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$androidxLifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:$androidxLifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$androidxLifecycleVersion")
+
+    // Compose
     implementation platform("androidx.compose:compose-bom:2023.08.00")
     implementation "androidx.compose.ui:ui"
     implementation "androidx.compose.ui:ui-graphics"
     implementation "androidx.compose.ui:ui-tooling-preview"
     implementation "androidx.compose.material3:material3"
+
+    // Room
+    implementation "androidx.room:room-runtime:$roomVersion"
+    ksp "androidx.room:room-compiler:$roomVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
 
     testImplementation "junit:junit:4.13.2"
     debugImplementation "androidx.compose.ui:ui-tooling"

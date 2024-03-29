@@ -13,6 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.InsulinDiary"
         tools:targetApi="31"
+        android:name=".InsulinDiaryApplication"
         >
         <activity
             android:name=".MainActivity"
