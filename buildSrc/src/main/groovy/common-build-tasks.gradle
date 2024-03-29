@@ -1,0 +1,202 @@
+
+void loadProperties(def fileName) {
+    Properties properties = readProperties(fileName)
+    if (properties == null) {
+        return
+    }
+    properties.each { property ->
+        // all extra properties must be set in: project.ext
+        project.ext.set(property.key, property.value)
+    }
+}
+
+/**
+ * Read a <code>.property</code> file and return its content as a Properties object
+ */
+Properties readProperties(def fileName) {
+    def propertiesFile = file(fileName)
+    if (!propertiesFile.exists()) {
+        println("Properties file missing: " + fileName)
+        return null
+    }
+
+    Properties properties = new Properties()
+    properties.load(propertiesFile.newReader("UTF-8"))
+    return properties
+}
+
+/**
+ * try to resolve key from <code>System Env</> if fail,
+ * delegate to <code>project.findProperty</>
+ */
+def getSecret(def key, def defaultValue = null) {
+    if (project.hasProperty(key)) {
+        return project.property(key)
+    }
+    if (!System.getenv(key)?.isEmpty()) {
+        return System.getenv(key)
+    }
+
+    return defaultValue
+}
+
+/**
+ * this evaluates a shell command, but is only tested against
+ * "git commands" that return single lie pre-formatted output.
+ *
+ * <p>use at own risk.</p>
+ *
+ * <p>example usage: evalGitCommand("git rev-list HEAD -n 1") will retrieve the hash of last commit</p>
+ */
+static def evalGitCommand(String command) {
+    def cmd = command.execute()
+    cmd.waitFor()
+    return cmd.text.trim()
+}
+
+/**
+ * attempts to retrieve the last tag committed/available in local git changelog.
+ * <p>this command is identical to running "git describe --tags --abbrev=0" shell in terminal</p>
+ */
+static def lastReleaseTag() {
+    // retrieve the name of last TAG reference (aka last release)
+    // TODO when we introduce tagging for commits other than releases, we should include pattern matching
+    //  in order to filter releases only
+    return evalGitCommand("git describe --tags --abbrev=0")
+}
+
+/**
+ * attempts to retrieve the number of commits since a specific git revision, from the local git changelog.
+ * <p>this command is identical to running "git rev-list $revision..HEAD --count" shell in terminal</p>
+ * @param revision - can be either TAG identifier or git commit hash
+ */
+static def commitsSinceRevision(String revision) {
+    return evalGitCommand("git rev-list $revision..HEAD --count").toInteger()
+}
+
+/**
+ * invokes {@link #commitsSinceRevision(java.lang.String)} by
+ * passing {@link #lastReleaseTag()} as argument
+ *
+ * @see #lastReleaseTag()
+ * @see #commitsSinceRevision(java.lang.String)
+ */
+static def commitsSinceLastRelease() {
+    return commitsSinceRevision(lastReleaseTag())
+}
+
+/**
+ * attempts to retrieve the number of commits since the first commit in the local git changelog.
+ * <p>this command is identical to running "git rev-list HEAD --count" shell in terminal</p>
+ */
+static def numberOfCommitsInRepository() {
+    return evalGitCommand("git rev-list HEAD --count").toInteger()
+}
+
+/**
+ * generates a build number based on provided version arguments
+ * summed with the number of commits in the local git changelog.
+ */
+static def buildVersionCode(int[] rawVersion) {
+    if (rawVersion.length != 3) {
+        throw IllegalArgumentException("rawVersion should always include 3 numbers [major, minor, patch]")
+    }
+
+    def commitsSinceLastRelease = commitsSinceLastRelease()
+    if (commitsSinceLastRelease >= 1_000) {
+        throw IllegalArgumentException("commitsSinceLastRelease > 1000 and will overflow in the patch version designated ordinal")
+    }
+
+    def major = rawVersion[0]
+    def minor = rawVersion[1]
+    def patch = rawVersion[2]
+
+    return ((major * 10_000_000)
+            + (minor * 100_000)
+            + (patch * 1_000)
+            + commitsSinceLastRelease).toInteger()
+}
+
+/**
+ * short version of <code>buildVersionName</code> that ignores build branch information
+ * @see #buildVersionName(int[])
+ */
+static String buildVersionNameShort(int[] rawVersion) {
+    if (rawVersion.length != 3) {
+        throw IllegalArgumentException("rawVersion should always include 3 numbers [major, minor, patch]")
+    }
+
+    def major = rawVersion[0]
+    def minor = rawVersion[1]
+    def patch = rawVersion[2]
+
+    return "$major.$minor.$patch"
+}
+
+/**
+ * creates a Version Name String for the provided version arguments and a git branch.
+ *
+ * branch name will be resolved from "BRANCH_NAME" environment variable, if set.
+ * or from local git revision.
+ *
+ * for "master" and "release" branches the branch name will be skipped in the final Version Name
+ */
+static String buildVersionName(int[] rawVersion) {
+    if (rawVersion.length != 3) {
+        throw IllegalArgumentException("rawVersion should always include 3 numbers [major, minor, patch]")
+    }
+
+    def major = rawVersion[0]
+    def minor = rawVersion[1]
+    def patch = rawVersion[2]
+
+    def branch_name = resolveCurrentGitBranchName()
+
+    if (branch_name == "master" || branch_name.startsWith("release")) {
+        // skip branch info for master/release builds
+        return "$major.$minor.$patch"
+    } else {
+        return "$major.$minor.$patch ($branch_name)"
+    }
+}
+
+/**
+ * CI pipeline checks a specific commit and runs in detached HEAD state.
+ * because of that the CI pipeline pushes the name of the branch
+ * that triggered the build in an environment variable called "BRANCH_NAME"
+ */
+private static String resolveCurrentGitBranchName() {
+    def branch_name = (System.getenv("BRANCH_NAME") ?: "").trim()
+
+    if (branch_name == null || branch_name.isEmpty()) {
+        // fallback to local git branch
+        branch_name = evalGitCommand("git rev-parse --abbrev-ref HEAD")
+    }
+
+    return branch_name
+}
+
+/**
+ * short change note string to help distinguish builds inside the Firebase Distribution Build List
+ */
+static String generateFirebaseDistributionChangeNotes() {
+    String currentBranchName = resolveCurrentGitBranchName()
+    String lastCommitHashShort = evalGitCommand("git rev-parse --short HEAD")
+    String lastCommitBody = evalGitCommand("git log -1 --pretty=format:%B")
+    return "${currentBranchName} ($lastCommitHashShort):\n${lastCommitBody}".replaceAll("\n", "\n  ")
+}
+
+ext {
+    getSecret = this.&getSecret
+    loadProperties = this.&loadProperties
+    readProperties = this.&readProperties
+    buildVersionNameShort = this.&buildVersionNameShort
+    buildVersionName = this.&buildVersionName
+    buildVersionCode = this.&buildVersionCode
+    commitsSinceLastRelease = this.&commitsSinceLastRelease
+    numberOfCommitsInRepository = this.&numberOfCommitsInRepository
+    evalGitCommand = this.&evalGitCommand
+    commitsSinceRevision = this.&commitsSinceRevision
+    lastReleaseTag = this.&lastReleaseTag
+    generateFirebaseDistributionChangeNotes = this.&generateFirebaseDistributionChangeNotes
+}

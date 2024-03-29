@@ -1,0 +1,13 @@
+plugins {
+    id 'groovy-gradle-plugin'
+}
+
+subprojects {
+    ext {
+        projectCompileSdk = 33
+        projectMinSdk = 29
+        projectTargetSdk = 32
+
+        ktxCoreVersion = "1.12.0"
+    }
+}
