@@ -15,6 +15,8 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import java.time.Instant
 import java.time.ZonedDateTime
 
 @Entity(tableName = "Measurements")
@@ -31,11 +33,11 @@ interface MeasurementDao {
     @Delete
     suspend fun delete(measurement: Measurement)
 
-//    @Query("SELECT * from Measurements WHERE id = :id")
-//    fun getItem(id: Int): Flow<Measurement>
-//
     @Query("SELECT * from Measurements")
     fun getAllItems(): Flow<List<Measurement>>
+
+    @Query("SELECT * from Measurements WHERE time BETWEEN :start and :end")
+    fun getAllItemsBetween(start: Long, end: Long): Flow<List<Measurement>>
 }
 
 @Database(entities = [Measurement::class], version = 1, exportSchema = false)
@@ -60,8 +62,10 @@ abstract class MeasurementsDatabase : RoomDatabase() {
 
 class Converters {
     @TypeConverter
-    fun fromZonedDateTime(zonedDateTime: ZonedDateTime): String = zonedDateTime.formatDateTimeUtc()
+    fun fromZonedDateTime(zonedDateTime: ZonedDateTime): Long =
+        zonedDateTime.toUtc().toInstant().toEpochMilli()
 
     @TypeConverter
-    fun toZonedDateTime(dateTime: String) = dateTime.parseDateTime()
+    fun toZonedDateTime(dateTime: Long):ZonedDateTime =
+        ZonedDateTime.ofInstant(Instant.ofEpochMilli(dateTime), zoneIdUtc)
 }
