@@ -21,6 +21,8 @@ data class DailyMeasurementAggregation(override val dateTime: ZonedDateTime, val
     override fun colorCode(): Color = measurements.fold(0.0) { acc, measurement ->
         acc + measurement.value
     }.let {
+        it / measurements.size
+    }.let {
         if (it < 0) {
             throw IllegalStateException("Negative aggregation") // TODO
         } else if (it <= 4.5) {
