@@ -58,7 +58,7 @@ fun MonthlyViewScreen(onDayClicked: (ZonedDateTime)-> Unit, viewModel: MonthlyVi
                 } else {
                     Modifier
                         .aspectRatio(1f)
-                        .background(Gray21A50.compositeOver(it.colorCode())) // TODO custom colors
+                        .background(Gray21A50.compositeOver(it.colorCode()))
                 }
 
                 Box(

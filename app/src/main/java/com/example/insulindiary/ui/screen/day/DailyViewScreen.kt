@@ -10,7 +10,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -18,10 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.insulindiary.data.Measurement
-import com.example.insulindiary.data.formatDateTime
 import com.example.insulindiary.data.formatDayMonthAndYear
-import com.example.insulindiary.data.formatMonthAndYear
 import com.example.insulindiary.data.formatTime
+import com.example.insulindiary.ui.screen.customcomposables.AddMeasurementDialog
 import com.example.insulindiary.ui.theme.InsulinDiaryTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,28 +36,48 @@ fun DailyViewScreen(onBackPressed: ()-> Unit, viewModel: DailyViewViewModelInter
 
         Text(
             text = date.value.formatDayMonthAndYear(),
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             textAlign = TextAlign.End,
             textDecoration = TextDecoration.Underline
         )
 
-        LazyColumn(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+        LazyColumn(modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp)) {
             items(measurements.value) {
-                Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = it.time.formatTime())
                     Text(text = it.value.toString())
                 }
             }
         }
 
-        Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            Button(onClick = { viewModel.insertDummyMeasurement() }) {
+        val inputMeasurementOpen = remember { mutableStateOf(false) }
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            Button(onClick = { inputMeasurementOpen.value = true }) {
                 Text(text = "Add New Measurement")
             }
 
             Button(onClick = onBackPressed) {
                 Text(text = "Back")
             }
+        }
+
+        if (inputMeasurementOpen.value) {
+            AddMeasurementDialog(
+                date.value,
+                onMeasurementNewMeasurement = { time, value -> viewModel.insertMeasurement(time, value) },
+                onDismissRequest = { inputMeasurementOpen.value = false }
+            )
         }
     }
 }
@@ -83,6 +103,10 @@ fun DailyViewScreenPreview() {
                 get() = MutableStateFlow(now)
 
             override fun insertDummyMeasurement() {
+                /* no-op */
+            }
+
+            override fun insertMeasurement(time: ZonedDateTime, value: Double) {
                 /* no-op */
             }
         })

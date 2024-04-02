@@ -3,6 +3,7 @@ package com.example.insulindiary
 import android.app.Application
 import com.example.insulindiary.data.MeasurementDao
 import com.example.insulindiary.data.MeasurementsDatabase
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
@@ -16,6 +17,6 @@ class InsulinDiaryApplication: Application() {
         private set
 
     fun selectDay(day: ZonedDateTime) {
-        selectedDay = day.truncatedTo(ChronoUnit.DAYS)
+        selectedDay = day.truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneId.systemDefault())
     }
 }

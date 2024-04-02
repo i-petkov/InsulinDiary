@@ -18,6 +18,7 @@ interface DailyViewViewModelInterface {
     val measurements: StateFlow<List<Measurement>>
     val day: StateFlow<ZonedDateTime>
     fun insertDummyMeasurement()
+    fun insertMeasurement(time: ZonedDateTime, value: Double)
 }
 
 class DailyViewViewModel(application: Application) : AndroidViewModel(application), DailyViewViewModelInterface {
@@ -37,8 +38,12 @@ class DailyViewViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     override fun insertDummyMeasurement() {
+        insertMeasurement(ZonedDateTime.now(), 1.1)
+    }
+
+    override fun insertMeasurement(time: ZonedDateTime, value: Double) {
         viewModelScope.launch {
-            measurementDao.insert(Measurement(ZonedDateTime.now(), 1.1))
+            measurementDao.insert(Measurement(time, value))
         }
     }
 }
