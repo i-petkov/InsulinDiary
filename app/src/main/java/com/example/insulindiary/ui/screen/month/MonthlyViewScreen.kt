@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,7 +41,8 @@ fun MonthlyViewScreen(onDayClicked: (ZonedDateTime)-> Unit, viewModel: MonthlyVi
 
         Text(
             text = monthAndYear.value.formatMonthAndYear(),
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(12.dp),
+            textDecoration = TextDecoration.Underline
         )
 
         LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = Modifier.fillMaxWidth()) {

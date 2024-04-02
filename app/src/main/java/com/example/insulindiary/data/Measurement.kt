@@ -36,7 +36,7 @@ interface MeasurementDao {
     @Query("SELECT * from Measurements")
     fun getAllItems(): Flow<List<Measurement>>
 
-    @Query("SELECT * from Measurements WHERE time BETWEEN :start and :end")
+    @Query("SELECT * from Measurements WHERE time BETWEEN :start and :end ORDER BY time ASC")
     fun getAllItemsBetween(start: Long, end: Long): Flow<List<Measurement>>
 }
 

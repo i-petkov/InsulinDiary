@@ -15,8 +15,6 @@ import com.example.insulindiary.ui.screen.month.MonthlyViewScreen
 import com.example.insulindiary.ui.screen.month.MonthlyViewViewModel
 import com.example.insulindiary.ui.theme.InsulinDiaryTheme
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 
@@ -26,6 +24,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         seedMeasurementForTesting()
+        val application = application as InsulinDiaryApplication
 
         setContent {
             InsulinDiaryTheme {
@@ -34,7 +33,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = Routes.MonthlyView.route) {
                     composable(Routes.MonthlyView.route) {
                         MonthlyViewScreen(onDayClicked = { day ->
-                            // TODO day payload?
+                            application.selectDay(day)
                             navController.navigate(Routes.DailyView.route)
                         }, viewModel<MonthlyViewViewModel>())
                     }
@@ -51,12 +50,13 @@ class MainActivity : ComponentActivity() {
     private fun seedMeasurementForTesting() {
         val dao = (application as InsulinDiaryApplication).measurementDao
         GlobalScope.launch {
-            val count = dao.getAllItems().count()
-            if (count == 0) {
-                val now = ZonedDateTime.now()
-                dao.insert(Measurement(now, 6.5))
-                dao.insert(Measurement(now.plusDays(1), 6.5))
-                dao.insert(Measurement(now.plusDays(2), 6.5))
+            dao.getAllItems().collect {
+                if (it.isEmpty()) {
+                    val now = ZonedDateTime.now()
+                    dao.insert(Measurement(now, 6.5))
+                    dao.insert(Measurement(now.plusDays(1), 6.5))
+                    dao.insert(Measurement(now.plusDays(2), 6.5))
+                }
             }
         }
     }
