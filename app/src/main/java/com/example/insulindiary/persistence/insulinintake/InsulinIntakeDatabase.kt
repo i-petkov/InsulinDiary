@@ -5,11 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.insulindiary.data.BaseInsulinIntake
+import com.example.insulindiary.data.InsulinIntakePlan
 import com.example.insulindiary.data.DailyInsulinIntake
 import com.example.insulindiary.persistence.Converters
 
-@Database(entities = [DailyInsulinIntake::class, BaseInsulinIntake::class], version = 1, exportSchema = false)
+@Database(entities = [DailyInsulinIntake::class, InsulinIntakePlan::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class InsulinIntakeDatabase : RoomDatabase() {
     companion object {
@@ -26,5 +26,5 @@ abstract class InsulinIntakeDatabase : RoomDatabase() {
         }
     }
 
-    abstract fun dailyInsulinIntakeDao(): InsulinIntakeDao
+    abstract fun insulinIntakeDao(): InsulinIntakeDao
 }

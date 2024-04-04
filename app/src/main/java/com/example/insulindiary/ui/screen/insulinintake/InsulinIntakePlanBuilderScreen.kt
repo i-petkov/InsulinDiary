@@ -26,14 +26,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.insulindiary.data.BaseInsulinIntake
+import com.example.insulindiary.data.InsulinIntakePlan
 import com.example.insulindiary.data.Intake
 import com.example.insulindiary.data.formatTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalTime
 
-interface DailyInsulinIntakeBuilderViewModelInterface {
+interface InsulinIntakePlanBuilderViewModelInterface {
     val intakes: StateFlow<List<Intake>>
     val baseIntakesNames: StateFlow<List<String>>
 
@@ -41,13 +41,13 @@ interface DailyInsulinIntakeBuilderViewModelInterface {
 
     fun removeIntake(intake: Intake)
 
-    fun storeBaseIntake(baseInsulinIntake: BaseInsulinIntake)
+    fun storeBaseIntake(baseInsulinIntake: InsulinIntakePlan)
 }
 
 @Composable
-fun DailyInsulinIntakeBuilderScreen(
+fun InsulinIntakePlanBuilderScreen(
     onBack: () -> Unit,
-    viewModel: DailyInsulinIntakeBuilderViewModelInterface
+    viewModel: InsulinIntakePlanBuilderViewModelInterface
 ) {
     val intakeBuilderOpen = remember { mutableStateOf(false) }
 
@@ -140,7 +140,7 @@ fun DailyInsulinIntakeBuilderScreen(
             Button(
                 modifier = Modifier.padding(12.dp),
                 onClick = {
-                    viewModel.storeBaseIntake(BaseInsulinIntake(0, nameState.value, intakes = intakes.value))
+                    viewModel.storeBaseIntake(InsulinIntakePlan(0, nameState.value, intakes = intakes.value))
                     onBack()
                 },
                 enabled = isNameValid
@@ -181,10 +181,10 @@ fun DailyInsulinIntakeBuilderScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun InsulinIntakeBuilderScreenPreview() {
-    DailyInsulinIntakeBuilderScreen(
+fun InsulinIntakePlanBuilderScreenPreview() {
+    InsulinIntakePlanBuilderScreen(
         { /* no-op */ },
-        object : DailyInsulinIntakeBuilderViewModelInterface {
+        object : InsulinIntakePlanBuilderViewModelInterface {
             override val intakes: StateFlow<List<Intake>>
                 get() =
                     MutableStateFlow(
@@ -205,7 +205,7 @@ fun InsulinIntakeBuilderScreenPreview() {
                 // no-op
             }
 
-            override fun storeBaseIntake(baseInsulinIntake: BaseInsulinIntake) {
+            override fun storeBaseIntake(baseInsulinIntake: InsulinIntakePlan) {
                 // no-op
             }
         }

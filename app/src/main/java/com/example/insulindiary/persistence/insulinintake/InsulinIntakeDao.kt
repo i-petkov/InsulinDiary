@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.insulindiary.data.BaseInsulinIntake
+import com.example.insulindiary.data.InsulinIntakePlan
 import com.example.insulindiary.data.DailyInsulinIntake
 import kotlinx.coroutines.flow.Flow
 
@@ -34,17 +34,17 @@ interface InsulinIntakeDao {
     fun getAllDailyIntakesAt(date: Long): Flow<List<DailyInsulinIntake>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(baseInsulinIntake: BaseInsulinIntake)
+    suspend fun insert(insulinIntakePlan: InsulinIntakePlan)
 
     @Update
-    suspend fun update(baseInsulinIntake: BaseInsulinIntake)
+    suspend fun update(insulinIntakePlan: InsulinIntakePlan)
 
     @Delete
-    suspend fun delete(baseInsulinIntake: BaseInsulinIntake)
+    suspend fun delete(insulinIntakePlan: InsulinIntakePlan)
 
-    @Query("SELECT * from BaseInsulinIntakes")
-    fun getAllBaseIntakes(): Flow<List<BaseInsulinIntake>>
+    @Query("SELECT * from InsulinIntakePlans")
+    fun getAllInsulinIntakePlans(): Flow<List<InsulinIntakePlan>>
 
-    @Query("SELECT * from BaseInsulinIntakes WHERE id = :id")
-    fun getBaseIntake(id: Long): Flow<BaseInsulinIntake>
+    @Query("SELECT * from InsulinIntakePlans WHERE id = :id")
+    fun getBaseIntake(id: Long): Flow<InsulinIntakePlan>
 }

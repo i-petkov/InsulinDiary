@@ -12,8 +12,8 @@ class DailyInsulinIntake(
     val intakes: List<Intake>
 )
 
-@Entity(tableName = "BaseInsulinIntakes")
-class BaseInsulinIntake(
+@Entity(tableName = "InsulinIntakePlans")
+class InsulinIntakePlan(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
     val name: String,
     val intakes: List<Intake>
