@@ -35,14 +35,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.insulindiary.data.formatTime
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
+import java.time.LocalDate
+import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMeasurementDialog(
-    currentDate: ZonedDateTime,
-    onMeasurementNewMeasurement: (ZonedDateTime, Double) -> Unit,
+    currentDate: LocalDate,
+    onMeasurementNewMeasurement: (LocalDate, LocalTime, Double) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     val timePickerOpen = remember { mutableStateOf(false) }
@@ -50,11 +50,7 @@ fun AddMeasurementDialog(
     var valueText by remember { mutableStateOf("") }
     val isValueValid = runCatching { valueText.toDouble() }.getOrNull()?.let { it in 0.0..50.0 } ?: false
 
-    fun TimePickerState.toZonedDateTime() =
-        currentDate
-            .truncatedTo(ChronoUnit.DAYS)
-            .withHour(hour)
-            .withMinute(minute)
+    fun TimePickerState.toLocalTime() = LocalTime.of(hour, minute)
 
     val backgroundColor = MaterialTheme.colorScheme.background
 
@@ -62,7 +58,7 @@ fun AddMeasurementDialog(
         Dialog(
             onDismissRequest = { onDismissRequest() }
         ) {
-            val time = timeState.toZonedDateTime()
+            val time = timeState.toLocalTime()
 
             Column(
                 modifier =
@@ -140,7 +136,7 @@ fun AddMeasurementDialog(
                                 .fillMaxWidth(0.5F),
                         onClick = {
                             val v = valueText.toDouble()
-                            onMeasurementNewMeasurement(time, v)
+                            onMeasurementNewMeasurement(currentDate, time, v)
                             onDismissRequest()
                         },
                         enabled = isValueValid
@@ -202,5 +198,5 @@ fun AddMeasurementDialog(
 @Composable
 fun AddMeasurementPickerPreview() {
     @Suppress("ktlint:standard:comment-wrapping")
-    AddMeasurementDialog(ZonedDateTime.now(), { time, value -> /* no-op */ }, { /* no-op */ })
+    AddMeasurementDialog(LocalDate.now(), { date, time, value -> /* no-op */ }, { /* no-op */ })
 }

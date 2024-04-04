@@ -15,12 +15,13 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import java.time.Instant
-import java.time.ZonedDateTime
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Entity(tableName = "Measurements")
 data class Measurement(
-    @PrimaryKey val time: ZonedDateTime,
+    @PrimaryKey val date: LocalDate,
+    val time: LocalTime,
     val value: Double
 )
 
@@ -38,11 +39,14 @@ interface MeasurementDao {
     @Query("SELECT * from Measurements")
     fun getAllItems(): Flow<List<Measurement>>
 
-    @Query("SELECT * from Measurements WHERE time BETWEEN :start and :end ORDER BY time ASC")
+    @Query("SELECT * from Measurements WHERE date BETWEEN :startDate and :endDate ORDER BY date ASC")
     fun getAllItemsBetween(
-        start: Long,
-        end: Long
+        startDate: Long,
+        endDate: Long
     ): Flow<List<Measurement>>
+
+    @Query("SELECT * from Measurements WHERE date = :date ORDER BY date ASC")
+    fun getAllItemsAt(date: Long): Flow<List<Measurement>>
 }
 
 @Database(entities = [Measurement::class], version = 1, exportSchema = false)
@@ -67,8 +71,14 @@ abstract class MeasurementsDatabase : RoomDatabase() {
 
 class Converters {
     @TypeConverter
-    fun fromZonedDateTime(zonedDateTime: ZonedDateTime): Long = zonedDateTime.toUtc().toInstant().toEpochMilli()
+    fun fromLocalTime(localDate: LocalTime): Int = localDate.toSecondOfDay()
 
     @TypeConverter
-    fun toZonedDateTime(dateTime: Long): ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(dateTime), zoneIdUtc)
+    fun toLocalTime(secondOfDay: Int): LocalTime = LocalTime.ofSecondOfDay(secondOfDay.toLong())
+
+    @TypeConverter
+    fun fromLocalDate(localDate: LocalDate): Long = localDate.toEpochDay()
+
+    @TypeConverter
+    fun toLocalDate(epochDay: Long): LocalDate = LocalDate.ofEpochDay(epochDay)
 }

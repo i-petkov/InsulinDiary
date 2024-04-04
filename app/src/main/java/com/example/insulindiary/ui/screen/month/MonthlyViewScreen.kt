@@ -27,18 +27,19 @@ import com.example.insulindiary.ui.theme.Gray21A50
 import com.example.insulindiary.ui.theme.InsulinDiaryTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.ZonedDateTime
+import java.time.LocalDate
+import java.time.LocalTime
 import kotlin.random.Random
 
 @Composable
 fun MonthlyViewScreen(
-    onDayClicked: (ZonedDateTime) -> Unit,
+    onDayClicked: (LocalDate) -> Unit,
     viewModel: MonthlyViewViewModelInterface
 ) {
     Column(
         horizontalAlignment = Alignment.End
     ) {
-        val monthAndYear = viewModel.monthAndYear.collectAsStateWithLifecycle(initialValue = ZonedDateTime.now())
+        val monthAndYear = viewModel.monthAndYear.collectAsStateWithLifecycle(initialValue = LocalDate.now())
         val measurements = viewModel.dailyAggregations.collectAsStateWithLifecycle(initialValue = emptyList())
 
         Text(
@@ -50,15 +51,15 @@ fun MonthlyViewScreen(
         LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = Modifier.fillMaxWidth()) {
             items(measurements.value) {
                 val isInRange =
-                    monthAndYear.value.month == it.dateTime.month &&
-                        monthAndYear.value.year == it.dateTime.year
+                    monthAndYear.value.month == it.date.month &&
+                        monthAndYear.value.year == it.date.year
 
                 val mod =
                     if (isInRange) {
                         Modifier
                             .aspectRatio(1f)
                             .background(it.colorCode())
-                            .clickable { onDayClicked(it.dateTime) }
+                            .clickable { onDayClicked(it.date) }
                     } else {
                         Modifier
                             .aspectRatio(1f)
@@ -80,18 +81,21 @@ fun MonthlyViewScreen(
 @Composable
 fun MonthScreenPreview() {
     fun buildDummyDailyAggregation(
-        dateTime: ZonedDateTime,
+        date: LocalDate,
+        time: LocalTime,
         measurement: Double
     ): DailyMeasurementAggregation {
-        return DailyMeasurementAggregation(dateTime, listOf(Measurement(dateTime, measurement)))
+        return DailyMeasurementAggregation(date, listOf(Measurement(date, time, measurement)))
     }
 
-    val now = ZonedDateTime.now()
+    val dateNow = LocalDate.now()
+    val timeNow = LocalTime.now()
     val random = Random(0xDEAD_BEEF)
     val dummy =
         List(31) {
             buildDummyDailyAggregation(
-                now.plusDays(it.toLong()),
+                dateNow.plusDays(it.toLong()),
+                timeNow,
                 4.5 + random.nextDouble(8.0)
             )
         }
@@ -102,8 +106,8 @@ fun MonthScreenPreview() {
             object : MonthlyViewViewModelInterface {
                 override val dailyAggregations: StateFlow<List<DailyMeasurementAggregation>>
                     get() = MutableStateFlow(dummy)
-                override val monthAndYear: StateFlow<ZonedDateTime>
-                    get() = MutableStateFlow(now)
+                override val monthAndYear: StateFlow<LocalDate>
+                    get() = MutableStateFlow(dateNow)
             }
         )
     }

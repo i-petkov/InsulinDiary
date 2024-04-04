@@ -16,7 +16,8 @@ import com.example.insulindiary.ui.screen.month.MonthlyViewViewModel
 import com.example.insulindiary.ui.theme.InsulinDiaryTheme
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.time.ZonedDateTime
+import java.time.LocalDate
+import java.time.LocalTime
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,10 +52,12 @@ class MainActivity : ComponentActivity() {
         GlobalScope.launch {
             dao.getAllItems().collect {
                 if (it.isEmpty()) {
-                    val now = ZonedDateTime.now()
-                    dao.insert(Measurement(now, 6.5))
-                    dao.insert(Measurement(now.plusDays(1), 6.5))
-                    dao.insert(Measurement(now.plusDays(2), 6.5))
+                    val date = LocalDate.now()
+                    val time = LocalTime.now()
+
+                    dao.insert(Measurement(date, time, 6.5))
+                    dao.insert(Measurement(date.plusDays(1), time, 6.5))
+                    dao.insert(Measurement(date.plusDays(2), time, 6.5))
                 }
             }
         }

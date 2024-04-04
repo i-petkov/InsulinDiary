@@ -25,7 +25,8 @@ import com.example.insulindiary.ui.screen.customcomposables.AddMeasurementDialog
 import com.example.insulindiary.ui.theme.InsulinDiaryTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.ZonedDateTime
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Composable
 fun DailyViewScreen(
@@ -34,7 +35,7 @@ fun DailyViewScreen(
 ) {
     Column {
         val measurements = viewModel.measurements.collectAsStateWithLifecycle(initialValue = listOf())
-        val date = viewModel.day.collectAsStateWithLifecycle(initialValue = ZonedDateTime.now())
+        val date = viewModel.day.collectAsStateWithLifecycle(initialValue = LocalDate.now())
 
         Text(
             text = date.value.formatDayMonthAndYear(),
@@ -85,7 +86,7 @@ fun DailyViewScreen(
         if (inputMeasurementOpen.value) {
             AddMeasurementDialog(
                 date.value,
-                onMeasurementNewMeasurement = { time, value -> viewModel.insertMeasurement(time, value) },
+                onMeasurementNewMeasurement = { d, t, v -> viewModel.insertMeasurement(d, t, v) },
                 onDismissRequest = { inputMeasurementOpen.value = false }
             )
         }
@@ -95,15 +96,16 @@ fun DailyViewScreen(
 @Preview(showBackground = true)
 @Composable
 fun DailyViewScreenPreview() {
-    val now = ZonedDateTime.now()
+    val date = LocalDate.now()
+    val time = LocalTime.now()
 
     val measurements =
         listOf(
-            Measurement(now, 6.5),
-            Measurement(now, 6.5),
-            Measurement(now, 6.5),
-            Measurement(now, 6.5),
-            Measurement(now, 6.5)
+            Measurement(date, time, 6.5),
+            Measurement(date, time, 6.5),
+            Measurement(date, time, 6.5),
+            Measurement(date, time, 6.5),
+            Measurement(date, time, 6.5)
         )
 
     InsulinDiaryTheme {
@@ -112,15 +114,16 @@ fun DailyViewScreenPreview() {
             object : DailyViewViewModelInterface {
                 override val measurements: StateFlow<List<Measurement>>
                     get() = MutableStateFlow(measurements)
-                override val day: StateFlow<ZonedDateTime>
-                    get() = MutableStateFlow(now)
+                override val day: StateFlow<LocalDate>
+                    get() = MutableStateFlow(date)
 
                 override fun insertDummyMeasurement() {
                     // no-op
                 }
 
                 override fun insertMeasurement(
-                    time: ZonedDateTime,
+                    date: LocalDate,
+                    time: LocalTime,
                     value: Double
                 ) {
                     // no-op

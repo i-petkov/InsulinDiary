@@ -1,7 +1,8 @@
 package com.example.insulindiary.data
 
+import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 /** Hours and Minutes in 24h format (21:30) */
@@ -18,22 +19,8 @@ val dd_mmmm_yyyy = DateTimeFormatter.ofPattern("dd MMMM, yyyy")
 
 val zoneIdUtc = ZoneId.of("UTC")
 
-fun currentTimeUtc() = ZonedDateTime.now(zoneIdUtc)
+fun LocalTime.formatTime() = format(hh_mm)
 
-fun currentTimeLocal() = ZonedDateTime.now(ZoneId.systemDefault())
+fun LocalDate.formatMonthAndYear(zoneId: ZoneId = ZoneId.systemDefault()) = format(mmmm_yyyy.withZone(zoneId))
 
-fun ZonedDateTime.toUtc() = withZoneSameInstant(zoneIdUtc)
-
-fun ZonedDateTime.toLocal() = withZoneSameInstant(ZoneId.systemDefault())
-
-fun ZonedDateTime.formatTime(zoneId: ZoneId = ZoneId.systemDefault()) = format(hh_mm.withZone(zoneId))
-
-fun ZonedDateTime.formatMonthAndYear(zoneId: ZoneId = ZoneId.systemDefault()) = format(mmmm_yyyy.withZone(zoneId))
-
-fun ZonedDateTime.formatDayMonthAndYear(zoneId: ZoneId = ZoneId.systemDefault()) = format(dd_mmmm_yyyy.withZone(zoneId))
-
-fun ZonedDateTime.formatDateTime(zoneId: ZoneId = ZoneId.systemDefault()) = format(DateTimeFormatter.ISO_DATE_TIME.withZone(zoneId))
-
-fun ZonedDateTime.formatDateTimeUtc() = formatDateTime(zoneIdUtc)
-
-fun String.parseDateTime(): ZonedDateTime = ZonedDateTime.parse(this, DateTimeFormatter.ISO_DATE_TIME)
+fun LocalDate.formatDayMonthAndYear(zoneId: ZoneId = ZoneId.systemDefault()) = format(dd_mmmm_yyyy.withZone(zoneId))

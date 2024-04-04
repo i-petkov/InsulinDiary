@@ -3,16 +3,16 @@ package com.example.insulindiary.data
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import java.lang.IllegalStateException
-import java.time.ZonedDateTime
+import java.time.LocalDate
 
 sealed interface DailyAggregation {
-    val dateTime: ZonedDateTime
+    val date: LocalDate
 
     fun colorCode(): Color
 }
 
 val DailyAggregation.dayOfMonth: Int
-    get() = dateTime.dayOfMonth
+    get() = date.dayOfMonth
 
 fun convertRange(
     oldValue: Double,
@@ -24,7 +24,7 @@ fun convertRange(
     return (((oldValue - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin
 }
 
-data class DailyMeasurementAggregation(override val dateTime: ZonedDateTime, val measurements: List<Measurement>) : DailyAggregation {
+data class DailyMeasurementAggregation(override val date: LocalDate, val measurements: List<Measurement>) : DailyAggregation {
     override fun colorCode(): Color =
         measurements.fold(0.0) { acc, measurement ->
             acc + measurement.value
@@ -44,6 +44,6 @@ data class DailyMeasurementAggregation(override val dateTime: ZonedDateTime, val
         }
 }
 
-data class EmptyDailyAggregation(override val dateTime: ZonedDateTime) : DailyAggregation {
+data class EmptyDailyAggregation(override val date: LocalDate) : DailyAggregation {
     override fun colorCode(): Color = Color(0xFFA1A1A1)
 }

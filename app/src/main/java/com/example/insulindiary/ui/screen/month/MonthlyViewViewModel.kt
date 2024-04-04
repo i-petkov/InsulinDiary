@@ -7,18 +7,17 @@ import com.example.insulindiary.InsulinDiaryApplication
 import com.example.insulindiary.data.DailyAggregation
 import com.example.insulindiary.data.DailyMeasurementAggregation
 import com.example.insulindiary.data.EmptyDailyAggregation
-import com.example.insulindiary.data.toUtc
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import java.time.ZonedDateTime
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 interface MonthlyViewViewModelInterface {
-    val monthAndYear: StateFlow<ZonedDateTime>
+    val monthAndYear: StateFlow<LocalDate>
     val dailyAggregations: StateFlow<List<DailyAggregation>>
 }
 
@@ -28,18 +27,16 @@ interface MonthlyViewViewModelInterface {
 //  need to investigate
 class MonthlyViewViewModel(application: Application) : AndroidViewModel(application), MonthlyViewViewModelInterface {
     private val measurementDao = (application as InsulinDiaryApplication).measurementDao
-    private val _monthAndYear = MutableStateFlow(ZonedDateTime.now().toUtc().truncatedTo(ChronoUnit.DAYS))
+    private val _monthAndYear = MutableStateFlow(LocalDate.now())
 
-    override val monthAndYear: StateFlow<ZonedDateTime> = _monthAndYear
+    override val monthAndYear: StateFlow<LocalDate> = _monthAndYear
     override val dailyAggregations: StateFlow<List<DailyAggregation>> =
         aggregate(_monthAndYear.value)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    private fun aggregate(ref: ZonedDateTime): Flow<List<DailyAggregation>> {
-        val refUtc = ref.toUtc()
-
-        val start = refUtc.withDayOfMonth(1)
-        val end = refUtc.plusMonths(1).withDayOfMonth(1)
+    private fun aggregate(ref: LocalDate): Flow<List<DailyAggregation>> {
+        val start = ref.withDayOfMonth(1)
+        val end = ref.plusMonths(1).withDayOfMonth(1)
 
         val queryBack = start.dayOfWeek.value - 1
         val queryForward = (7 - (end.dayOfWeek.value - 1)) % 7
@@ -50,16 +47,16 @@ class MonthlyViewViewModel(application: Application) : AndroidViewModel(applicat
         val totalDays = ChronoUnit.DAYS.between(exStart, exEnd)
 
         return measurementDao.getAllItemsBetween(
-            exStart.toInstant().toEpochMilli(),
-            exEnd.toInstant().toEpochMilli()
+            exStart.toEpochDay(),
+            exEnd.toEpochDay()
         ).map {
             val groupedByDay =
                 it.groupBy { measurement ->
-                    measurement.time.truncatedTo(ChronoUnit.DAYS)
+                    measurement.date
                 }
 
             List(totalDays.toInt()) { index ->
-                val day = exStart.plusDays(index.toLong()).truncatedTo(ChronoUnit.DAYS)
+                val day = exStart.plusDays(index.toLong())
                 groupedByDay[day]
                     ?.let { measurements -> DailyMeasurementAggregation(day, measurements) }
                     ?: EmptyDailyAggregation(day)
