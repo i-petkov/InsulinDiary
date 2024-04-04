@@ -28,29 +28,37 @@ import kotlinx.coroutines.flow.StateFlow
 import java.time.ZonedDateTime
 
 @Composable
-fun DailyViewScreen(onBackPressed: ()-> Unit, viewModel: DailyViewViewModelInterface) {
+fun DailyViewScreen(
+    onBackPressed: () -> Unit,
+    viewModel: DailyViewViewModelInterface
+) {
     Column {
-
         val measurements = viewModel.measurements.collectAsStateWithLifecycle(initialValue = listOf())
         val date = viewModel.day.collectAsStateWithLifecycle(initialValue = ZonedDateTime.now())
 
         Text(
             text = date.value.formatDayMonthAndYear(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
             textAlign = TextAlign.End,
             textDecoration = TextDecoration.Underline
         )
 
-        LazyColumn(modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp)) {
+        LazyColumn(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+        ) {
             items(measurements.value) {
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(text = it.time.formatTime())
                     Text(text = it.value.toString())
                 }
@@ -62,7 +70,9 @@ fun DailyViewScreen(onBackPressed: ()-> Unit, viewModel: DailyViewViewModelInter
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Button(onClick = { inputMeasurementOpen.value = true }) {
                 Text(text = "Add New Measurement")
             }
@@ -87,28 +97,35 @@ fun DailyViewScreen(onBackPressed: ()-> Unit, viewModel: DailyViewViewModelInter
 fun DailyViewScreenPreview() {
     val now = ZonedDateTime.now()
 
-    val measurements = listOf(
-        Measurement(now, 6.5),
-        Measurement(now, 6.5),
-        Measurement(now, 6.5),
-        Measurement(now, 6.5),
-        Measurement(now, 6.5)
-    )
+    val measurements =
+        listOf(
+            Measurement(now, 6.5),
+            Measurement(now, 6.5),
+            Measurement(now, 6.5),
+            Measurement(now, 6.5),
+            Measurement(now, 6.5)
+        )
 
     InsulinDiaryTheme {
-        DailyViewScreen(onBackPressed = { /* no-op */ }, object : DailyViewViewModelInterface {
-            override val measurements: StateFlow<List<Measurement>>
-                get() = MutableStateFlow(measurements)
-            override val day: StateFlow<ZonedDateTime>
-                get() = MutableStateFlow(now)
+        DailyViewScreen(
+            onBackPressed = { /* no-op */ },
+            object : DailyViewViewModelInterface {
+                override val measurements: StateFlow<List<Measurement>>
+                    get() = MutableStateFlow(measurements)
+                override val day: StateFlow<ZonedDateTime>
+                    get() = MutableStateFlow(now)
 
-            override fun insertDummyMeasurement() {
-                /* no-op */
-            }
+                override fun insertDummyMeasurement() {
+                    // no-op
+                }
 
-            override fun insertMeasurement(time: ZonedDateTime, value: Double) {
-                /* no-op */
+                override fun insertMeasurement(
+                    time: ZonedDateTime,
+                    value: Double
+                ) {
+                    // no-op
+                }
             }
-        })
+        )
     }
 }

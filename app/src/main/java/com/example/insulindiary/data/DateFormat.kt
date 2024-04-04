@@ -6,10 +6,13 @@ import java.time.format.DateTimeFormatter
 
 /** Hours and Minutes in 24h format (21:30) */
 val hh_mm = DateTimeFormatter.ofPattern("HH:mm")
+
 /** Hours and Minutes in 12h format (09:30 PM) */
 val hh_mm_a = DateTimeFormatter.ofPattern("hh:mm a")
+
 /** month and year (March, 2024) */
 val mmmm_yyyy = DateTimeFormatter.ofPattern("MMMM, yyyy")
+
 /** month and year (02 March, 2024) */
 val dd_mmmm_yyyy = DateTimeFormatter.ofPattern("dd MMMM, yyyy")
 

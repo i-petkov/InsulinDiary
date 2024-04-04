@@ -15,12 +15,14 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
 import java.time.ZonedDateTime
 
 @Entity(tableName = "Measurements")
-data class Measurement(@PrimaryKey val time: ZonedDateTime, val value: Double)
+data class Measurement(
+    @PrimaryKey val time: ZonedDateTime,
+    val value: Double
+)
 
 @Dao
 interface MeasurementDao {
@@ -37,7 +39,10 @@ interface MeasurementDao {
     fun getAllItems(): Flow<List<Measurement>>
 
     @Query("SELECT * from Measurements WHERE time BETWEEN :start and :end ORDER BY time ASC")
-    fun getAllItemsBetween(start: Long, end: Long): Flow<List<Measurement>>
+    fun getAllItemsBetween(
+        start: Long,
+        end: Long
+    ): Flow<List<Measurement>>
 }
 
 @Database(entities = [Measurement::class], version = 1, exportSchema = false)
@@ -45,27 +50,25 @@ interface MeasurementDao {
 abstract class MeasurementsDatabase : RoomDatabase() {
     companion object {
         @Volatile
-        private var Instance: MeasurementsDatabase? = null
+        private var instance: MeasurementsDatabase? = null
 
         fun getDatabase(context: Context): MeasurementsDatabase {
             // if the Instance is not null, return it, otherwise create a new database instance.
-            return Instance ?: synchronized(this) {
+            return instance ?: synchronized(this) {
                 Room.databaseBuilder(context, MeasurementsDatabase::class.java, "measurements_database")
                     .build()
-                    .also { Instance = it }
+                    .also { instance = it }
             }
         }
     }
-    abstract fun measurementDao(): MeasurementDao
 
+    abstract fun measurementDao(): MeasurementDao
 }
 
 class Converters {
     @TypeConverter
-    fun fromZonedDateTime(zonedDateTime: ZonedDateTime): Long =
-        zonedDateTime.toUtc().toInstant().toEpochMilli()
+    fun fromZonedDateTime(zonedDateTime: ZonedDateTime): Long = zonedDateTime.toUtc().toInstant().toEpochMilli()
 
     @TypeConverter
-    fun toZonedDateTime(dateTime: Long):ZonedDateTime =
-        ZonedDateTime.ofInstant(Instant.ofEpochMilli(dateTime), zoneIdUtc)
+    fun toZonedDateTime(dateTime: Long): ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(dateTime), zoneIdUtc)
 }

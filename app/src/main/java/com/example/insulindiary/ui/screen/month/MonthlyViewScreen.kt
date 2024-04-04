@@ -31,11 +31,13 @@ import java.time.ZonedDateTime
 import kotlin.random.Random
 
 @Composable
-fun MonthlyViewScreen(onDayClicked: (ZonedDateTime)-> Unit, viewModel: MonthlyViewViewModelInterface) {
+fun MonthlyViewScreen(
+    onDayClicked: (ZonedDateTime) -> Unit,
+    viewModel: MonthlyViewViewModelInterface
+) {
     Column(
         horizontalAlignment = Alignment.End
     ) {
-
         val monthAndYear = viewModel.monthAndYear.collectAsStateWithLifecycle(initialValue = ZonedDateTime.now())
         val measurements = viewModel.dailyAggregations.collectAsStateWithLifecycle(initialValue = emptyList())
 
@@ -47,54 +49,62 @@ fun MonthlyViewScreen(onDayClicked: (ZonedDateTime)-> Unit, viewModel: MonthlyVi
 
         LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = Modifier.fillMaxWidth()) {
             items(measurements.value) {
-                val isInRange = monthAndYear.value.month == it.dateTime.month &&
+                val isInRange =
+                    monthAndYear.value.month == it.dateTime.month &&
                         monthAndYear.value.year == it.dateTime.year
 
-                val mod = if (isInRange) {
-                    Modifier
-                        .aspectRatio(1f)
-                        .background(it.colorCode())
-                        .clickable { onDayClicked(it.dateTime) }
-                } else {
-                    Modifier
-                        .aspectRatio(1f)
-                        .background(Gray21A50.compositeOver(it.colorCode()))
-                }
+                val mod =
+                    if (isInRange) {
+                        Modifier
+                            .aspectRatio(1f)
+                            .background(it.colorCode())
+                            .clickable { onDayClicked(it.dateTime) }
+                    } else {
+                        Modifier
+                            .aspectRatio(1f)
+                            .background(Gray21A50.compositeOver(it.colorCode()))
+                    }
 
                 Box(
                     modifier = mod,
-                    contentAlignment = Alignment.TopEnd,
+                    contentAlignment = Alignment.TopEnd
                 ) {
                     Text(text = it.dayOfMonth.toString())
                 }
             }
         }
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MonthScreenPreview() {
-    fun buildDummyDailyAggregation(dateTime: ZonedDateTime, measurement: Double): DailyMeasurementAggregation {
+    fun buildDummyDailyAggregation(
+        dateTime: ZonedDateTime,
+        measurement: Double
+    ): DailyMeasurementAggregation {
         return DailyMeasurementAggregation(dateTime, listOf(Measurement(dateTime, measurement)))
     }
 
     val now = ZonedDateTime.now()
     val random = Random(0xDEAD_BEEF)
-    val dummy = List(31) {
-        buildDummyDailyAggregation(
-            now.plusDays(it.toLong()),
-            4.5 + random.nextDouble(8.0)
-        )
-    }
+    val dummy =
+        List(31) {
+            buildDummyDailyAggregation(
+                now.plusDays(it.toLong()),
+                4.5 + random.nextDouble(8.0)
+            )
+        }
 
     InsulinDiaryTheme {
-        MonthlyViewScreen({ /* no-op */ }, object : MonthlyViewViewModelInterface {
-            override val dailyAggregations: StateFlow<List<DailyMeasurementAggregation>>
-                get() = MutableStateFlow(dummy)
-            override val monthAndYear: StateFlow<ZonedDateTime>
-                get() = MutableStateFlow(now)
-        })
+        MonthlyViewScreen(
+            { /* no-op */ },
+            object : MonthlyViewViewModelInterface {
+                override val dailyAggregations: StateFlow<List<DailyMeasurementAggregation>>
+                    get() = MutableStateFlow(dummy)
+                override val monthAndYear: StateFlow<ZonedDateTime>
+                    get() = MutableStateFlow(now)
+            }
+        )
     }
 }

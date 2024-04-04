@@ -7,8 +7,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
-class InsulinDiaryApplication: Application() {
-
+class InsulinDiaryApplication : Application() {
     val measurementDao: MeasurementDao by lazy {
         MeasurementsDatabase.getDatabase(this).measurementDao()
     }

@@ -17,8 +17,13 @@ import java.time.temporal.ChronoUnit
 interface DailyViewViewModelInterface {
     val measurements: StateFlow<List<Measurement>>
     val day: StateFlow<ZonedDateTime>
+
     fun insertDummyMeasurement()
-    fun insertMeasurement(time: ZonedDateTime, value: Double)
+
+    fun insertMeasurement(
+        time: ZonedDateTime,
+        value: Double
+    )
 }
 
 class DailyViewViewModel(application: Application) : AndroidViewModel(application), DailyViewViewModelInterface {
@@ -27,8 +32,9 @@ class DailyViewViewModel(application: Application) : AndroidViewModel(applicatio
     private val _day = MutableStateFlow((application as InsulinDiaryApplication).selectedDay)
     override val day: StateFlow<ZonedDateTime> = _day
 
-    override val measurements: StateFlow<List<Measurement>> = aggregateMeasurements(day.value)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    override val measurements: StateFlow<List<Measurement>> =
+        aggregateMeasurements(day.value)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private fun aggregateMeasurements(date: ZonedDateTime): Flow<List<Measurement>> {
         val start = date.truncatedTo(ChronoUnit.DAYS)
@@ -41,7 +47,10 @@ class DailyViewViewModel(application: Application) : AndroidViewModel(applicatio
         insertMeasurement(ZonedDateTime.now(), 1.1)
     }
 
-    override fun insertMeasurement(time: ZonedDateTime, value: Double) {
+    override fun insertMeasurement(
+        time: ZonedDateTime,
+        value: Double
+    ) {
         viewModelScope.launch {
             measurementDao.insert(Measurement(time, value))
         }

@@ -40,16 +40,21 @@ import java.time.temporal.ChronoUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddMeasurementDialog(currentDate: ZonedDateTime, onMeasurementNewMeasurement: (ZonedDateTime, Double)-> Unit, onDismissRequest: () -> Unit) {
+fun AddMeasurementDialog(
+    currentDate: ZonedDateTime,
+    onMeasurementNewMeasurement: (ZonedDateTime, Double) -> Unit,
+    onDismissRequest: () -> Unit
+) {
     val timePickerOpen = remember { mutableStateOf(false) }
     val timeState: TimePickerState = rememberTimePickerState()
     var valueText by remember { mutableStateOf("") }
     val isValueValid = runCatching { valueText.toDouble() }.getOrNull()?.let { it in 0.0..50.0 } ?: false
 
-    fun TimePickerState.toZonedDateTime() = currentDate
-        .truncatedTo(ChronoUnit.DAYS)
-        .withHour(hour)
-        .withMinute(minute)
+    fun TimePickerState.toZonedDateTime() =
+        currentDate
+            .truncatedTo(ChronoUnit.DAYS)
+            .withHour(hour)
+            .withMinute(minute)
 
     val backgroundColor = MaterialTheme.colorScheme.background
 
@@ -60,16 +65,18 @@ fun AddMeasurementDialog(currentDate: ZonedDateTime, onMeasurementNewMeasurement
             val time = timeState.toZonedDateTime()
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)
-                    .background(backgroundColor),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp)
+                        .background(backgroundColor),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
                     text = "Set Measurement",
                     textAlign = TextAlign.End
                 )
@@ -79,8 +86,10 @@ fun AddMeasurementDialog(currentDate: ZonedDateTime, onMeasurementNewMeasurement
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     item {
-                        Box(modifier = Modifier
-                            .padding(12.dp)
+                        Box(
+                            modifier =
+                                Modifier
+                                    .padding(12.dp)
                         ) {
                             TextField(
                                 value = time.formatTime(),
@@ -92,38 +101,43 @@ fun AddMeasurementDialog(currentDate: ZonedDateTime, onMeasurementNewMeasurement
                                 onValueChange = { /* no-op */ },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                             )
-                            Text(modifier = Modifier.matchParentSize()
-                                .clickable { timePickerOpen.value = true },
+                            Text(
+                                modifier =
+                                    Modifier.matchParentSize()
+                                        .clickable { timePickerOpen.value = true },
                                 text = ""
                             )
                         }
                     }
                     item {
                         TextField(
-                            modifier = Modifier
-                                .padding(12.dp),
+                            modifier =
+                                Modifier
+                                    .padding(12.dp),
                             value = valueText,
                             label = {
                                 Text(text = "value")
                             },
                             isError = !isValueValid,
                             singleLine = true,
-                            onValueChange = { valueText = it},
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            onValueChange = { valueText = it },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                         )
                     }
                 }
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(
-                        modifier = Modifier
-                            .width(IntrinsicSize.Min)
-                            .fillMaxWidth(0.5F),
+                        modifier =
+                            Modifier
+                                .width(IntrinsicSize.Min)
+                                .fillMaxWidth(0.5F),
                         onClick = {
                             val v = valueText.toDouble()
                             onMeasurementNewMeasurement(time, v)
@@ -135,9 +149,10 @@ fun AddMeasurementDialog(currentDate: ZonedDateTime, onMeasurementNewMeasurement
                     }
 
                     Button(
-                        modifier = Modifier
-                            .width(IntrinsicSize.Min)
-                            .fillMaxWidth(0.5F),
+                        modifier =
+                            Modifier
+                                .width(IntrinsicSize.Min)
+                                .fillMaxWidth(0.5F),
                         onClick = { onDismissRequest() }
                     ) {
                         Text(text = "Cancel")
@@ -151,25 +166,28 @@ fun AddMeasurementDialog(currentDate: ZonedDateTime, onMeasurementNewMeasurement
                 onDismissRequest = { timePickerOpen.value = false }
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp)
-                        .background(backgroundColor),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                            .background(backgroundColor),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.End
                 ) {
                     TimePicker(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 24.dp, bottom = 12.dp, start = 12.dp, end = 12.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 24.dp, bottom = 12.dp, start = 12.dp, end = 12.dp),
                         state = timeState,
-                        layoutType = TimePickerDefaults.layoutType(),
+                        layoutType = TimePickerDefaults.layoutType()
                     )
 
                     Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 12.dp, bottom = 24.dp, start = 12.dp, end = 12.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp, bottom = 24.dp, start = 12.dp, end = 12.dp),
                         onClick = { timePickerOpen.value = false }
                     ) {
                         Text(text = "OK")
@@ -183,5 +201,6 @@ fun AddMeasurementDialog(currentDate: ZonedDateTime, onMeasurementNewMeasurement
 @Preview(showBackground = true)
 @Composable
 fun AddMeasurementPickerPreview() {
-    AddMeasurementDialog(ZonedDateTime.now(), { time, value -> /* no-op */}, {/* no-op */})
+    @Suppress("ktlint:standard:comment-wrapping")
+    AddMeasurementDialog(ZonedDateTime.now(), { time, value -> /* no-op */ }, { /* no-op */ })
 }
