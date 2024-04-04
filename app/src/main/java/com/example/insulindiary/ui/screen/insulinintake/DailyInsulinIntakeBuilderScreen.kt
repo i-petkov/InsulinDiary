@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -28,12 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.insulindiary.data.BaseInsulinIntake
-import com.example.insulindiary.data.DailyInsulinIntake
 import com.example.insulindiary.data.Intake
 import com.example.insulindiary.data.formatTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.LocalDate
 import java.time.LocalTime
 
 interface DailyInsulinIntakeBuilderViewModelInterface {
@@ -41,19 +38,25 @@ interface DailyInsulinIntakeBuilderViewModelInterface {
     val baseIntakesNames: StateFlow<List<String>>
 
     fun addIntake(intake: Intake)
+
     fun removeIntake(intake: Intake)
+
     fun storeBaseIntake(baseInsulinIntake: BaseInsulinIntake)
 }
 
 @Composable
-fun DailyInsulinIntakeBuilderScreen(onBack: () -> Unit, viewModel: DailyInsulinIntakeBuilderViewModelInterface) {
+fun DailyInsulinIntakeBuilderScreen(
+    onBack: () -> Unit,
+    viewModel: DailyInsulinIntakeBuilderViewModelInterface
+) {
     val intakeBuilderOpen = remember { mutableStateOf(false) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
             text = "Create Insulin Intake",
             textAlign = TextAlign.Center
         )
@@ -62,13 +65,15 @@ fun DailyInsulinIntakeBuilderScreen(onBack: () -> Unit, viewModel: DailyInsulinI
         val baseIntakesNames = viewModel.baseIntakesNames.collectAsStateWithLifecycle(initialValue = emptyList())
 
         val nameState = remember { mutableStateOf("") }
-        val isNameValid = nameState.value.trim().isNotBlank() &&
+        val isNameValid =
+            nameState.value.trim().isNotBlank() &&
                 !baseIntakesNames.value.contains(nameState.value)
 
         TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
             value = nameState.value,
             onValueChange = { nameState.value = it },
             isError = !isNameValid,
@@ -82,45 +87,56 @@ fun DailyInsulinIntakeBuilderScreen(onBack: () -> Unit, viewModel: DailyInsulinI
         }
 
         LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
         ) {
             items(intakes.value) {
                 // intakes view
-                Row(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp)) {
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(12.dp)
+                ) {
                     Text(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1F),
+                        modifier =
+                            Modifier
+                                .fillMaxHeight()
+                                .weight(1F),
                         text = it.time.formatTime(),
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1F),
+                        modifier =
+                            Modifier
+                                .fillMaxHeight()
+                                .weight(1F),
                         text = it.dosage.toString(),
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1F),
+                        modifier =
+                            Modifier
+                                .fillMaxHeight()
+                                .weight(1F),
                         text = it.type,
                         textAlign = TextAlign.Center
                     )
-                    Icon(Icons.Default.Clear, contentDescription = "Remove Intake", modifier = Modifier
-                        .weight(0.3F)
-                        .clickable { viewModel.removeIntake(it) })
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = "Remove Intake",
+                        modifier =
+                            Modifier
+                                .weight(0.3F)
+                                .clickable { viewModel.removeIntake(it) }
+                    )
                 }
             }
         }
 
         Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
-
             Button(
                 modifier = Modifier.padding(12.dp),
                 onClick = {
@@ -141,7 +157,6 @@ fun DailyInsulinIntakeBuilderScreen(onBack: () -> Unit, viewModel: DailyInsulinI
                 Text(text = "Cancel")
             }
         }
-
     }
 
     if (intakeBuilderOpen.value) {
@@ -162,35 +177,37 @@ fun DailyInsulinIntakeBuilderScreen(onBack: () -> Unit, viewModel: DailyInsulinI
             }
         }
     }
-
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun InsulinIntakeBuilderScreenPreview() {
-    DailyInsulinIntakeBuilderScreen({ /* no-op */ }, object : DailyInsulinIntakeBuilderViewModelInterface {
-        override val intakes: StateFlow<List<Intake>>
-            get() = MutableStateFlow(
-                listOf(
-                    Intake(LocalTime.now(), 20.0, "Tresiba"),
-                    Intake(LocalTime.now(), 20.0, "Tresiba"),
-                    Intake(LocalTime.now(), 20.0, "Tresiba")
-                )
-            )
-        override val baseIntakesNames: StateFlow<List<String>>
-            get() = MutableStateFlow(emptyList())
+    DailyInsulinIntakeBuilderScreen(
+        { /* no-op */ },
+        object : DailyInsulinIntakeBuilderViewModelInterface {
+            override val intakes: StateFlow<List<Intake>>
+                get() =
+                    MutableStateFlow(
+                        listOf(
+                            Intake(LocalTime.now(), 20.0, "Tresiba"),
+                            Intake(LocalTime.now(), 20.0, "Tresiba"),
+                            Intake(LocalTime.now(), 20.0, "Tresiba")
+                        )
+                    )
+            override val baseIntakesNames: StateFlow<List<String>>
+                get() = MutableStateFlow(emptyList())
 
-        override fun addIntake(intake: Intake) {
-            /* no-op */
-        }
+            override fun addIntake(intake: Intake) {
+                // no-op
+            }
 
-        override fun removeIntake(intake: Intake) {
-            /* no-op */
-        }
+            override fun removeIntake(intake: Intake) {
+                // no-op
+            }
 
-        override fun storeBaseIntake(baseInsulinIntake: BaseInsulinIntake) {
-            /* no-op */
+            override fun storeBaseIntake(baseInsulinIntake: BaseInsulinIntake) {
+                // no-op
+            }
         }
-    })
+    )
 }
