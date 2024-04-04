@@ -1,8 +1,8 @@
 package com.example.insulindiary
 
 import android.app.Application
-import com.example.insulindiary.data.MeasurementDao
-import com.example.insulindiary.data.MeasurementsDatabase
+import com.example.insulindiary.persistence.measurement.MeasurementDao
+import com.example.insulindiary.persistence.measurement.MeasurementsDatabase
 import java.time.LocalDate
 
 class InsulinDiaryApplication : Application() {
