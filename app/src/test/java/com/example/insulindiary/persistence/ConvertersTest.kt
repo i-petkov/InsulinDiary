@@ -1,5 +1,6 @@
 package com.example.insulindiary.persistence
 
+import com.example.insulindiary.data.Intake
 import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalTime
@@ -61,5 +62,47 @@ class ConvertersTest {
             val actual = converter.toLocalDate(dateData.key)
             assert(expected == actual)
         }
+    }
+
+    @Test
+    fun fromIntakeListSingle() {
+        val intakeList = listOf(Intake(LocalTime.of(7, 0), 20.0, "Tresiba"))
+
+        val expected = """[{ "time": 25200, "dosage": 20.0, "type": "Tresiba" }]""".trimIndent()
+        val actual = converter.fromIntakeList(intakeList)
+        assert(expected == actual)
+    }
+
+    @Test
+    fun fromIntakeListMultiple() {
+        val intakeList = listOf(
+            Intake(LocalTime.of(7, 0), 20.0, "Tresiba"),
+            Intake(LocalTime.of(7, 0), 20.0, "Tresiba"),
+            Intake(LocalTime.of(7, 0), 20.0, "Tresiba")
+        )
+
+        val expected = """[{ "time": 25200, "dosage": 20.0, "type": "Tresiba" },{ "time": 25200, "dosage": 20.0, "type": "Tresiba" },{ "time": 25200, "dosage": 20.0, "type": "Tresiba" }]""".trimIndent()
+        val actual = converter.fromIntakeList(intakeList)
+        assert(expected == actual)
+    }
+
+    @Test
+    fun toIntakeListSingle() {
+        val expected = listOf(Intake(LocalTime.of(7, 0), 20.0, "Tresiba"))
+        val actual = converter.toIntakeList("""[{ "time": 25200, "dosage": 20.0, "type": "Tresiba" }]""".trimIndent())
+
+        assert(expected == actual)
+    }
+
+    @Test
+    fun toIntakeListMultiple() {
+        val expected = listOf(
+            Intake(LocalTime.of(7, 0), 20.0, "Tresiba"),
+            Intake(LocalTime.of(7, 0), 20.0, "Tresiba"),
+            Intake(LocalTime.of(7, 0), 20.0, "Tresiba")
+        )
+        val actual = converter.toIntakeList("""[{ "time": 25200, "dosage": 20.0, "type": "Tresiba" },{ "time": 25200, "dosage": 20.0, "type": "Tresiba" },{ "time": 25200, "dosage": 20.0, "type": "Tresiba" }]""".trimIndent())
+
+        assert(expected == actual)
     }
 }
