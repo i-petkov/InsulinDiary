@@ -2,14 +2,19 @@ package com.example.insulindiary.ui.screen.month
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,7 +38,8 @@ import kotlin.random.Random
 
 @Composable
 fun MonthlyViewScreen(
-    onDayClicked: (LocalDate) -> Unit,
+    onDayPressed: (LocalDate) -> Unit,
+    onSettingsPressed: () -> Unit,
     viewModel: MonthlyViewViewModelInterface
 ) {
     Column(
@@ -42,11 +48,15 @@ fun MonthlyViewScreen(
         val monthAndYear = viewModel.monthAndYear.collectAsStateWithLifecycle(initialValue = LocalDate.now())
         val measurements = viewModel.dailyAggregations.collectAsStateWithLifecycle(initialValue = emptyList())
 
-        Text(
-            text = monthAndYear.value.formatMonthAndYear(),
-            modifier = Modifier.padding(12.dp),
-            textDecoration = TextDecoration.Underline
-        )
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Icon(modifier = Modifier.padding(12.dp).clickable { onSettingsPressed() }, imageVector = Icons.Default.Settings, contentDescription = "Go to Application Settings")
+            Text(
+                text = monthAndYear.value.formatMonthAndYear(),
+                modifier = Modifier.padding(12.dp),
+                textDecoration = TextDecoration.Underline
+            )
+        }
 
         LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = Modifier.fillMaxWidth()) {
             items(measurements.value) {
@@ -59,7 +69,7 @@ fun MonthlyViewScreen(
                         Modifier
                             .aspectRatio(1f)
                             .background(it.colorCode())
-                            .clickable { onDayClicked(it.date) }
+                            .clickable { onDayPressed(it.date) }
                     } else {
                         Modifier
                             .aspectRatio(1f)
@@ -101,9 +111,7 @@ fun MonthScreenPreview() {
         }
 
     InsulinDiaryTheme {
-        MonthlyViewScreen(
-            { /* no-op */ },
-            object : MonthlyViewViewModelInterface {
+        MonthlyViewScreen( { /* no-op */ }, { /* no-op */ }, object : MonthlyViewViewModelInterface {
                 override val dailyAggregations: StateFlow<List<DailyMeasurementAggregation>>
                     get() = MutableStateFlow(dummy)
                 override val monthAndYear: StateFlow<LocalDate>
