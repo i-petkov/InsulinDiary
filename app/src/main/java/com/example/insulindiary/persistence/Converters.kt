@@ -1,6 +1,8 @@
 package com.example.insulindiary.persistence
 
 import androidx.room.TypeConverter
+import com.example.insulindiary.data.Intake
+import org.json.JSONArray
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -16,4 +18,19 @@ class Converters {
 
     @TypeConverter
     fun toLocalDate(epochDay: Long): LocalDate = LocalDate.ofEpochDay(epochDay)
+
+    @TypeConverter
+    fun fromIntakeList(intakes: List<Intake>) =
+        intakes
+            .joinToString(prefix = "[", postfix = "]", separator = ",") {
+                it.toJason()
+            }
+
+    @TypeConverter
+    fun toIntakeList(jsonArrayString: String) =
+        JSONArray(jsonArrayString).let { array ->
+            List(array.length()) {
+                Intake.fromJsonObject(array.getJSONObject(it))
+            }
+        }
 }

@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.insulindiary.data.formatTime
+import com.example.insulindiary.util.toLocalTime
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -49,8 +50,6 @@ fun AddMeasurementDialog(
     val timeState: TimePickerState = rememberTimePickerState()
     var valueText by remember { mutableStateOf("") }
     val isValueValid = runCatching { valueText.toDouble() }.getOrNull()?.let { it in 0.0..50.0 } ?: false
-
-    fun TimePickerState.toLocalTime() = LocalTime.of(hour, minute)
 
     val backgroundColor = MaterialTheme.colorScheme.background
 
