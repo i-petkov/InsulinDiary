@@ -12,11 +12,15 @@ import androidx.compose.ui.unit.dp
 import com.example.insulindiary.ui.screen.Routes
 
 @Composable
-fun SettingsScreen(navigateTo: (Routes) -> Unit, onBackPressed: () -> Unit) {
+fun SettingsScreen(
+    navigateTo: (Routes) -> Unit,
+    onBackPressed: () -> Unit
+) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(12.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(12.dp)
     ) {
         Button(onClick = { navigateTo(Routes.InsulinIntakePlans) }) {
             Text(text = "Insulin Intake Plans")

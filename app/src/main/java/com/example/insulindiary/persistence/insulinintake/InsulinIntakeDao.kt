@@ -6,8 +6,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.insulindiary.data.InsulinIntakePlan
 import com.example.insulindiary.data.DailyInsulinIntake
+import com.example.insulindiary.data.InsulinIntakePlan
 import kotlinx.coroutines.flow.Flow
 
 @Dao

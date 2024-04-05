@@ -5,8 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.insulindiary.data.InsulinIntakePlan
 import com.example.insulindiary.data.DailyInsulinIntake
+import com.example.insulindiary.data.InsulinIntakePlan
 import com.example.insulindiary.persistence.Converters
 
 @Database(entities = [DailyInsulinIntake::class, InsulinIntakePlan::class], version = 1, exportSchema = false)

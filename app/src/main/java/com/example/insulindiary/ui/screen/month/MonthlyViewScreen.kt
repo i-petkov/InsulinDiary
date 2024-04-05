@@ -48,7 +48,6 @@ fun MonthlyViewScreen(
         val monthAndYear = viewModel.monthAndYear.collectAsStateWithLifecycle(initialValue = LocalDate.now())
         val measurements = viewModel.dailyAggregations.collectAsStateWithLifecycle(initialValue = emptyList())
 
-
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Icon(modifier = Modifier.padding(12.dp).clickable { onSettingsPressed() }, imageVector = Icons.Default.Settings, contentDescription = "Go to Application Settings")
             Text(
@@ -111,7 +110,10 @@ fun MonthScreenPreview() {
         }
 
     InsulinDiaryTheme {
-        MonthlyViewScreen( { /* no-op */ }, { /* no-op */ }, object : MonthlyViewViewModelInterface {
+        MonthlyViewScreen(
+            { /* no-op */ },
+            { /* no-op */ },
+            object : MonthlyViewViewModelInterface {
                 override val dailyAggregations: StateFlow<List<DailyMeasurementAggregation>>
                     get() = MutableStateFlow(dummy)
                 override val monthAndYear: StateFlow<LocalDate>

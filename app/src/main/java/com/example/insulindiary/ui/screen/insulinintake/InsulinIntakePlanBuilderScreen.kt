@@ -54,9 +54,9 @@ fun InsulinIntakePlanBuilderScreen(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
             text = "Create Insulin Intake",
             textAlign = TextAlign.Center
         )
@@ -67,13 +67,13 @@ fun InsulinIntakePlanBuilderScreen(
         val nameState = remember { mutableStateOf("") }
         val isNameValid =
             nameState.value.trim().isNotBlank() &&
-                    !baseIntakesNames.value.contains(nameState.value)
+                !baseIntakesNames.value.contains(nameState.value)
 
         TextField(
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
             value = nameState.value,
             onValueChange = { nameState.value = it },
             isError = !isNameValid,
@@ -88,39 +88,39 @@ fun InsulinIntakePlanBuilderScreen(
 
         LazyColumn(
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
         ) {
             items(intakes.value) {
                 // intakes view
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(12.dp)
+                        Modifier
+                            .fillMaxSize()
+                            .padding(12.dp)
                 ) {
                     Text(
                         modifier =
-                        Modifier
-                            .fillMaxHeight()
-                            .weight(1F),
+                            Modifier
+                                .fillMaxHeight()
+                                .weight(1F),
                         text = it.time.formatTime(),
                         textAlign = TextAlign.Center
                     )
                     Text(
                         modifier =
-                        Modifier
-                            .fillMaxHeight()
-                            .weight(1F),
+                            Modifier
+                                .fillMaxHeight()
+                                .weight(1F),
                         text = it.dosage.toString(),
                         textAlign = TextAlign.Center
                     )
                     Text(
                         modifier =
-                        Modifier
-                            .fillMaxHeight()
-                            .weight(1F),
+                            Modifier
+                                .fillMaxHeight()
+                                .weight(1F),
                         text = it.type,
                         textAlign = TextAlign.Center
                     )
@@ -128,9 +128,9 @@ fun InsulinIntakePlanBuilderScreen(
                         Icons.Default.Clear,
                         contentDescription = "Remove Intake",
                         modifier =
-                        Modifier
-                            .weight(0.3F)
-                            .clickable { viewModel.removeIntake(it) }
+                            Modifier
+                                .weight(0.3F)
+                                .clickable { viewModel.removeIntake(it) }
                     )
                 }
             }
@@ -162,10 +162,11 @@ fun InsulinIntakePlanBuilderScreen(
     if (intakeBuilderOpen.value) {
         Dialog(onDismissRequest = { intakeBuilderOpen.value = false }) {
             Column(
-                modifier = Modifier
-                    .height(IntrinsicSize.Min)
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
+                modifier =
+                    Modifier
+                        .height(IntrinsicSize.Min)
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val timePickerState = rememberTimePickerState()
@@ -175,29 +176,47 @@ fun InsulinIntakePlanBuilderScreen(
                 val dosage = remember { mutableStateOf("") }
                 val type = remember { mutableStateOf("") }
 
-                val dosageIsValid = runCatching { dosage.value.toDouble() }.getOrNull()
-                    ?.let { it in 0.0..50.0 }
-                    ?: false
+                val dosageIsValid =
+                    runCatching { dosage.value.toDouble() }.getOrNull()
+                        ?.let { it in 0.0..50.0 }
+                        ?: false
 
                 val typeIsValid = type.value.isNotBlank()
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
                 ) {
-                    TextField(keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier
-                        .weight(1f)
-                        .padding(12.dp), isError = !dosageIsValid, label = { Text(text = "dosage") }, value = dosage.value, onValueChange = { dosage.value = it })
-                    TextField(modifier = Modifier
-                        .weight(1f)
-                        .padding(12.dp), isError = !typeIsValid, label = { Text(text = "type") }, value = type.value, onValueChange = { type.value = it })
+                    TextField(
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .padding(12.dp),
+                        isError = !dosageIsValid,
+                        label = { Text(text = "dosage") },
+                        value = dosage.value,
+                        onValueChange = { dosage.value = it },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                    )
+                    TextField(
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .padding(12.dp),
+                        isError = !typeIsValid,
+                        label = { Text(text = "type") },
+                        value = type.value,
+                        onValueChange = { type.value = it }
+                    )
                 }
 
                 Row {
                     Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(12.dp),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .padding(12.dp),
                         onClick = {
                             viewModel.addIntake(
                                 Intake(
@@ -214,9 +233,10 @@ fun InsulinIntakePlanBuilderScreen(
                     }
 
                     Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(12.dp),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .padding(12.dp),
                         onClick = { intakeBuilderOpen.value = false }
                     ) {
                         Text(text = "Cancel")

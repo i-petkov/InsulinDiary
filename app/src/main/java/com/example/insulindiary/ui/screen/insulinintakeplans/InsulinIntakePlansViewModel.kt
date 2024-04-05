@@ -16,11 +16,12 @@ interface InsulinIntakePlansViewModelInterface {
     fun delete(intakePlan: InsulinIntakePlan)
 }
 
-class InsulinIntakePlansViewModel(application: Application) : AndroidViewModel( application), InsulinIntakePlansViewModelInterface {
+class InsulinIntakePlansViewModel(application: Application) : AndroidViewModel(application), InsulinIntakePlansViewModelInterface {
     private val insulinIntakeDao = (application as InsulinDiaryApplication).insulinIntakeDao
 
-    override val intakePlans: StateFlow<List<InsulinIntakePlan>> = insulinIntakeDao.getAllInsulinIntakePlans()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    override val intakePlans: StateFlow<List<InsulinIntakePlan>> =
+        insulinIntakeDao.getAllInsulinIntakePlans()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     override fun delete(intakePlan: InsulinIntakePlan) {
         viewModelScope.launch {

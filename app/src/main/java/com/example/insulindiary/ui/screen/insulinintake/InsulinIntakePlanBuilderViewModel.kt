@@ -30,9 +30,10 @@ class InsulinIntakePlanBuilderViewModel(application: Application) : AndroidViewM
     private val _intakes = MutableStateFlow(emptyList<Intake>())
 
     override val intakes: StateFlow<List<Intake>> = _intakes
-    override val baseIntakesNames: StateFlow<List<String>> = insulinIntakeDao.getAllInsulinIntakePlans()
-        .map { plans -> plans.map { it.name } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    override val baseIntakesNames: StateFlow<List<String>> =
+        insulinIntakeDao.getAllInsulinIntakePlans()
+            .map { plans -> plans.map { it.name } }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     override fun addIntake(intake: Intake) {
         _intakes.value = _intakes.value + intake

@@ -13,7 +13,6 @@ import com.example.insulindiary.ui.screen.day.DailyViewScreen
 import com.example.insulindiary.ui.screen.day.DailyViewViewModel
 import com.example.insulindiary.ui.screen.insulinintake.InsulinIntakePlanBuilderScreen
 import com.example.insulindiary.ui.screen.insulinintake.InsulinIntakePlanBuilderViewModel
-import com.example.insulindiary.ui.screen.insulinintake.InsulinIntakePlanBuilderViewModelInterface
 import com.example.insulindiary.ui.screen.insulinintakeplans.InsulinIntakePlansScreen
 import com.example.insulindiary.ui.screen.insulinintakeplans.InsulinIntakePlansViewModel
 import com.example.insulindiary.ui.screen.month.MonthlyViewScreen
@@ -62,8 +61,8 @@ class MainActivity : ComponentActivity() {
                     composable(Routes.InsulinIntakePlans.route) {
                         InsulinIntakePlansScreen(
                             onBackPressed = { navController.popBackStack() },
-                            onEditIntakePlanPressed = { /* TODO start InsulinIntakePlanBuilder with payload? */  },
-                            onCreateNewIntakePlanPressed = { navController.navigate(Routes.InsulinIntakePlanBuilder.route)},
+                            onEditIntakePlanPressed = { /* TODO start InsulinIntakePlanBuilder with payload? */ },
+                            onCreateNewIntakePlanPressed = { navController.navigate(Routes.InsulinIntakePlanBuilder.route) },
                             viewModel<InsulinIntakePlansViewModel>()
                         )
                     }

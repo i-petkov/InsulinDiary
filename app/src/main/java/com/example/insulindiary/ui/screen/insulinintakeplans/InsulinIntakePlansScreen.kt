@@ -28,60 +28,94 @@ import java.time.LocalTime
 
 @Composable
 fun InsulinIntakePlansScreen(
-    onBackPressed: ()->Unit,
-    onEditIntakePlanPressed: (Long)->Unit,
-    onCreateNewIntakePlanPressed: ()->Unit,
+    onBackPressed: () -> Unit,
+    onEditIntakePlanPressed: (Long) -> Unit,
+    onCreateNewIntakePlanPressed: () -> Unit,
     viewModel: InsulinIntakePlansViewModelInterface
 ) {
     val intakePlans = viewModel.intakePlans.collectAsStateWithLifecycle(initialValue = emptyList())
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(12.dp)
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(12.dp)
     ) {
+        Text(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+            text = "TITLE",
+            textAlign = TextAlign.Center
+        )
 
-        Text(modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp), text = "TITLE", textAlign = TextAlign.Center)
-
-        LazyColumn(modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp)
-        ) {
-            items(intakePlans.value) {
-                Row(modifier = Modifier
+        LazyColumn(
+            modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(12.dp)
+        ) {
+            items(intakePlans.value) {
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
                 ) {
-                    Text(modifier = Modifier
-                        .weight(1F)
-                        .padding(12.dp), text = it.name, textAlign = TextAlign.Center)
-                    Icon(modifier = Modifier
-                        .weight(0.2F)
-                        .padding(12.dp)
-                        .clickable { onEditIntakePlanPressed(it.id) }, imageVector = Icons.Default.Edit, contentDescription = "Edit Plan")
-                    Icon(modifier = Modifier
-                        .weight(0.2F)
-                        .padding(12.dp)
-                        .clickable { viewModel.delete(it) }, imageVector = Icons.Default.Clear, contentDescription = "Remove Plan")
+                    Text(
+                        modifier =
+                            Modifier
+                                .weight(1F)
+                                .padding(12.dp),
+                        text = it.name,
+                        textAlign = TextAlign.Center
+                    )
+                    Icon(
+                        modifier =
+                            Modifier
+                                .weight(0.2F)
+                                .padding(12.dp)
+                                .clickable { onEditIntakePlanPressed(it.id) },
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Plan"
+                    )
+                    Icon(
+                        modifier =
+                            Modifier
+                                .weight(0.2F)
+                                .padding(12.dp)
+                                .clickable { viewModel.delete(it) },
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "Remove Plan"
+                    )
                 }
             }
         }
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
         ) {
-            Button(modifier = Modifier
-                .weight(1F)
-                .padding(12.dp), onClick = { onCreateNewIntakePlanPressed() }) {
+            Button(
+                modifier =
+                    Modifier
+                        .weight(1F)
+                        .padding(12.dp),
+                onClick = { onCreateNewIntakePlanPressed() }
+            ) {
                 Text(text = "Create New")
             }
 
-            Button(modifier = Modifier
-                .weight(1F)
-                .padding(12.dp), onClick = { onBackPressed() }) {
+            Button(
+                modifier =
+                    Modifier
+                        .weight(1F)
+                        .padding(12.dp),
+                onClick = { onBackPressed() }
+            ) {
                 Text(text = "Back")
             }
         }
@@ -91,26 +125,33 @@ fun InsulinIntakePlansScreen(
 @Preview(showBackground = true)
 @Composable
 fun InsulinIntakePlansScreenPreview() {
-    val intakeList = listOf(
-        Intake(LocalTime.of(7, 0), 10.0, "Fast"),
-        Intake(LocalTime.of(13, 0), 10.0, "Fast"),
-        Intake(LocalTime.of(19, 0), 10.0, "Fast"),
-        Intake(LocalTime.of(22, 0), 10.0, "Slow"),
-    )
+    val intakeList =
+        listOf(
+            Intake(LocalTime.of(7, 0), 10.0, "Fast"),
+            Intake(LocalTime.of(13, 0), 10.0, "Fast"),
+            Intake(LocalTime.of(19, 0), 10.0, "Fast"),
+            Intake(LocalTime.of(22, 0), 10.0, "Slow")
+        )
 
-    val intakePlans = listOf(
-        InsulinIntakePlan(0, "4xIntake", intakeList),
-        InsulinIntakePlan(0, "4xIntake1", intakeList),
-        InsulinIntakePlan(0, "4xIntake2", intakeList)
-    )
+    val intakePlans =
+        listOf(
+            InsulinIntakePlan(0, "4xIntake", intakeList),
+            InsulinIntakePlan(0, "4xIntake1", intakeList),
+            InsulinIntakePlan(0, "4xIntake2", intakeList)
+        )
 
     @Suppress("ktlint:standard:comment-wrapping")
-    InsulinIntakePlansScreen({/* no-op */}, { _ ->/* no-op */}, {/* no-op */}, object : InsulinIntakePlansViewModelInterface {
-        override val intakePlans: StateFlow<List<InsulinIntakePlan>>
-            get() = MutableStateFlow(intakePlans)
+    InsulinIntakePlansScreen(
+        { /* no-op */ },
+        { _ -> /* no-op */ },
+        { /* no-op */ },
+        object : InsulinIntakePlansViewModelInterface {
+            override val intakePlans: StateFlow<List<InsulinIntakePlan>>
+                get() = MutableStateFlow(intakePlans)
 
-        override fun delete(intakePlan: InsulinIntakePlan) {
-            /* no-op */
+            override fun delete(intakePlan: InsulinIntakePlan) {
+                // no-op
+            }
         }
-    })
+    )
 }
